@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fugata's Pizzas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d4ba 100%);
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #c92a2a 0%, #e03131 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .menu-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: #c92a2a;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 3px solid #ffa8a8;
+            padding-bottom: 0.5rem;
+        }
+
+        .pizza-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .pizza-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid #ffa8a8;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .pizza-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(201, 42, 42, 0.2);
+        }
+
+        .pizza-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .pizza-name {
+            color: #c92a2a;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .pizza-ingredients {
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .pizza-price {
+            color: #c92a2a;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .order-btn {
+            background: linear-gradient(135deg, #c92a2a 0%, #e03131 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        .order-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #a61e1e 0%, #c92a2a 100%);
+        }
+
+        .cart {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #c92a2a;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .cart:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            background: #ffa8a8;
+            color: #c92a2a;
+            border-radius: 50%;
+            padding: 0.3rem 0.6rem;
+            margin-left: 0.5rem;
+            font-weight: bold;
+        }
+
+        footer {
+            background: #c92a2a;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .pizza-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍕 Fugata's Pizzas 🍕</h1>
+        <p class="subtitle">Las pizzas más deliciosas de la ciudad</p>
+    </header>
+
+    <div class="container">
+        <div class="menu-section">
+            <h2 class="section-title">Nuestras Pizzas Especiales</h2>
+            <div class="pizza-grid" id="pizzaGrid"></div>
+        </div>
+    </div>
+
+    <div class="cart" id="cart" onclick="verCarrito()">
+        🛒 Carrito <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Fugata's Pizzas - Todos los derechos reservados</p>
+        <p>📞 Teléfono: (555) 123-4567 | 📍 Dirección: Calle Principal 123</p>
+    </footer>
+
+    <script>
+        const pizzas = [
+            {
+                name: "Margherita",
+                ingredients: "Salsa de tomate, mozzarella, albahaca fresca",
+                price: 8500,
+                icon: "🍕"
+            },
+            {
+                name: "Pepperoni",
+                ingredients: "Salsa de tomate, mozzarella, pepperoni",
+                price: 9500,
+                icon: "🍕"
+            },
+            {
+                name: "Jamón y Queso",
+                ingredients: "Salsa de tomate, mozzarella, jamón rosado",
+                price: 9000,
+                icon: "🍕"
+            },
+            {
+                name: "Cuatro Quesos",
+                ingredients: "Mozzarella, parmesano, gorgonzola, provolone",
+                price: 10500,
+                icon: "🧀"
+            },
+            {
+                name: "Vegetariana",
+                ingredients: "Salsa de tomate, mozzarella, pimientos, champiñones, cebolla, aceitunas",
+                price: 9500,
+                icon: "🥗"
+            },
+            {
+                name: "Hawaiana",
+                ingredients: "Salsa de tomate, mozzarella, jamón, piña",
+                price: 9500,
+                icon: "🍍"
+            },
+            {
+                name: "Napolitana",
+                ingredients: "Salsa de tomate, mozzarella, anchoas, alcaparras, orégano",
+                price: 10000,
+                icon: "🐟"
+            },
+            {
+                name: "Especial Fugata's",
+                ingredients: "Salsa de tomate, mozzarella, jamón, champiñones, pimientos, aceitunas",
+                price: 11500,
+                icon: "⭐"
+            }
+        ];
+
+        let carrito = [];
+
+        function renderPizzas() {
+            const grid = document.getElementById('pizzaGrid');
+            grid.innerHTML = '';
+
+            pizzas.forEach((pizza, index) => {
+                const card = document.createElement('div');
+                card.className = 'pizza-card';
+                card.innerHTML = `
+                    <div class="pizza-icon">${pizza.icon}</div>
+                    <div class="pizza-name">${pizza.name}</div>
+                    <div class="pizza-ingredients">${pizza.ingredients}</div>
+                    <div class="pizza-price">$${pizza.price.toLocaleString()}</div>
+                    <button class="order-btn" onclick="agregarAlCarrito(${index})">
+                        Agregar al Carrito
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function agregarAlCarrito(index) {
+            carrito.push(pizzas[index]);
+            actualizarCarrito();
+            mostrarNotificacion(`${pizzas[index].name} agregada al carrito`);
+        }
+
+        function actualizarCarrito() {
+            document.getElementById('cartCount').textContent = carrito.length;
+        }
+
+        function verCarrito() {
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+
+            let mensaje = 'Tu pedido:\n\n';
+            let total = 0;
+
+            carrito.forEach(pizza => {
+                mensaje += `${pizza.name} - $${pizza.price.toLocaleString()}\n`;
+                total += pizza.price;
+            });
+
+            mensaje += `\nTotal: $${total.toLocaleString()}`;
+            
+            if (confirm(mensaje + '\n\n¿Deseas confirmar tu pedido?')) {
+                alert('¡Gracias por tu pedido! Lo recibirás en 30-45 minutos.');
+                carrito = [];
+                actualizarCarrito();
+            }
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notif = document.createElement('div');
+            notif.textContent = mensaje;
+            notif.style.cssText = `
+                position: fixed;
+                top: 2rem;
+                right: 2rem;
+                background: #51cf66;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            document.body.appendChild(notif);
+
+            setTimeout(() => {
+                notif.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notif.remove(), 300);
+            }, 2000);
+        }
+
+        renderPizzas();
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>
